@@ -133,7 +133,7 @@ namespace INIPlusPlus
 
 
         /// <summary>
-        /// Returns the names of all non-abstract sections.
+        /// Returns the names of all sections.
         /// </summary>
         /// <param name="showAbstractSections">If true, abstract sections will be displayed (default is false)</param>
         /// <returns>A string array</returns>
@@ -182,7 +182,7 @@ namespace INIPlusPlus
         /// <typeparam name="T">Type of the value to read</typeparam>
         /// <param name="section">Section in which to read the value</param>
         /// <param name="key">Key of the value</param>
-        /// <param name="separator">Separator character between values in the array</param>
+        /// <param name="separator">Separator character to use between values in the array</param>
         /// <returns>An array of values</returns>
         public T[] GetValueArray<T>(string section, string key, char separator = ',')
         {
@@ -208,12 +208,12 @@ namespace INIPlusPlus
         }
 
         /// <summary>
-        /// Sets a value in the INI file
+        /// Sets a value in the INI file.
         /// </summary>
         /// <typeparam name="T">Type of the value to set</typeparam>
-        /// <param name="section"></param>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="section">Section in which to set the value</param>
+        /// <param name="key">Key of the value to set</param>
+        /// <param name="value">Value</param>
         public void SetValue<T>(string section, string key, T value)
         {
             if (CanConvertStringFrom<T>())
@@ -222,17 +222,48 @@ namespace INIPlusPlus
                 WriteValue(section, key, "");
         }
 
-        public void SetValueArray<T>(string section, string key, T[] val, char separator = ',')
+        /// <summary>
+        /// Sets an value array in the INI file.
+        /// </summary>
+        /// <typeparam name="T">Type of the value array to set</typeparam>
+        /// <param name="section">Section in which to set the value array</param>
+        /// <param name="key">Key of the value array to set</param>
+        /// <param name="value">Value array</param>
+        /// <param name="separator">Separator character to use between values in the array</param>
+        public void SetValueArray<T>(string section, string key, T[] value, char separator = ',')
         {
-            val = val ?? new T[0];
-            object oVal = val;
+            value = value ?? new T[0];
+            object oVal = value;
 
             if (typeof(T) == typeof(string))
                 WriteValue(section, key, string.Join(separator.ToString(), (string[])oVal));
             else
-                WriteValue(section, key, val.ToString());
+                WriteValue(section, key, value.ToString());
         }
 
+        /// <summary>
+        /// Gets or sets a value.
+        /// </summary>
+        /// <param name="section">Section in which to set the value</param>
+        /// <param name="key">Key of the value to set</param>
+        /// <returns>The value</returns>
+        public string this[string section, string key]
+        {
+            get
+            {
+                return ReadValue(section, key);
+            }
+            set
+            {
+                WriteValue(section, key, value);
+            }
+        }
+
+        /// <summary>
+        /// Returns all keys in a section.
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
         public string[] GetKeysInSection(string section)
         {
             if (!Sections.ContainsKey(section)) return new string[0];
@@ -255,17 +286,6 @@ namespace INIPlusPlus
             return keys.Distinct().OrderBy(x => x).ToArray();
         }
 
-        //public string[] GetTopLevelKeysInSection(string section)
-        //{
-        //    List<string> keys = new List<string>(GetKeysInSection(section));
-
-        //    for (int i = 0; i < keys.Count; i++)
-        //        if (keys[i].Contains("."))
-        //            keys[i] = keys[i].Substring(0, keys[i].IndexOf("."));
-
-        //    return keys.Distinct().ToArray();
-        //}
-
         /// <summary>
         /// Does the value exist?
         /// </summary>
@@ -277,6 +297,12 @@ namespace INIPlusPlus
             return ReadValue(section, key) != null;
         }
 
+        /// <summary>
+        /// Returns a raw string value or null if it doesn't exist.
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         private string ReadValue(string section, string key)
         {
             if (string.IsNullOrEmpty(section) || string.IsNullOrEmpty(key)) return null;
@@ -302,7 +328,7 @@ namespace INIPlusPlus
         }
 
         /// <summary>
-        /// Write a value to the INI file
+        /// Write a value into the INI file.
         /// </summary>
         /// <param name="section">Section to write to</param>
         /// <param name="key">Key to write</param>
@@ -385,6 +411,12 @@ namespace INIPlusPlus
             }
         }
 
+        /// <summary>
+        /// Can a string be converted to a value type for reading from the INI file?
+        /// Can be overridden to add more supported types.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
+        /// <returns>True or false</returns>
         protected virtual bool CanConvertStringTo<T>()
         {
             Type type = typeof(T);
@@ -401,6 +433,12 @@ namespace INIPlusPlus
             return false;
         }
 
+        /// <summary>
+        /// Can a value type be converted to a string for writing into the INI file?
+        /// Can be overridden to add more supported types.
+        /// </summary>
+        /// <typeparam name="T">Type to convert from</typeparam>
+        /// <returns>True or false</returns>
         protected virtual bool CanConvertStringFrom<T>()
         {
             Type type = typeof(T);
@@ -417,6 +455,14 @@ namespace INIPlusPlus
             return false;
         }
 
+        /// <summary>
+        /// Converts a string to a value type for reading from the INI file.
+        /// Can be overridden to add more supported types.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
+        /// <param name="value">Value</param>
+        /// <param name="defaultValue">Default value to return if something goes wrong</param>
+        /// <returns>A value of type T</returns>
         protected virtual T ConvertStringTo<T>(string value, T defaultValue = default)
         {
             Type type = typeof(T);
@@ -439,6 +485,13 @@ namespace INIPlusPlus
             return (T)outObject;
         }
 
+        /// <summary>
+        /// Converts a string from a value type for writing into the INI file.
+        /// Can be overridden to add more supported types.
+        /// </summary>
+        /// <typeparam name="T">Type to convert from</typeparam>
+        /// <param name="value">Value</param>
+        /// <returns>A string</returns>
         protected virtual string ConvertStringFrom<T>(T value)
         {
             Type type = typeof(T);
@@ -458,6 +511,12 @@ namespace INIPlusPlus
             return outString;
         }
 
+        /// <summary>
+        /// Calls ConvertStringTo<T> on all elements in a array to convert a string[] array to a T[] array.
+        /// </summary>
+        /// <typeparam name="T">Type of array to convert to</typeparam>
+        /// <param name="sourceArray">Source string array</param>
+        /// <returns>An array of type T</returns>
         private T[] ConvertArray<T>(string[] sourceArray)
         {
             try
