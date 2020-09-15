@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConversionTools.cs" />
     <Compile Include="INIFile.cs" />
     <Compile Include="INIFileSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
