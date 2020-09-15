@@ -135,9 +135,13 @@ namespace INIPlusPlus
         /// <summary>
         /// Returns the names of all non-abstract sections.
         /// </summary>
+        /// <param name="showAbstractSections">If true, abstract sections will be displayed (default is false)</param>
         /// <returns>A string array</returns>
-        public string[] GetSections()
+        public string[] GetSections(bool showAbstractSections = false)
         {
+            if (showAbstractSections)
+                return Sections.Keys.OrderBy(x => x).ToArray();
+
             return (from string s in Sections.Keys where !Sections[s].Abstract select s).OrderBy(x => x).ToArray();
         }
 
