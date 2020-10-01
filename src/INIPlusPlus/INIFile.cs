@@ -287,6 +287,25 @@ namespace INIPlusPlus
         }
 
         /// <summary>
+        /// Returns all top-level keys in a section.
+        /// Top-level keys are keys before the first dot in the name. For instance, if keys are "client1.name", "client1.adress", "client2.name" and "client2.adress", top-level keys are "client1" and "client2"
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        public string[] GetTopLevelKeysInSection(string section)
+        {
+            string[] keys = GetKeysInSection(section);
+
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (keys[i].Contains("."))
+                    keys[i] = keys[i].Substring(0, keys[i].IndexOf("."));
+            }
+
+            return keys.Distinct().ToArray();
+        }
+
+        /// <summary>
         /// Does the value exist?
         /// </summary>
         /// <param name="section">Section in which the value is stored</param>
