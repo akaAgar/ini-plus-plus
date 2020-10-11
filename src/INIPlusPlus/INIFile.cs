@@ -364,7 +364,7 @@ namespace INIPlusPlus
                 Sections.Add(section, new INIFileSection());
             
             Sections[section][key] = value;
-            
+
             return true;
         }
 
@@ -423,8 +423,8 @@ namespace INIPlusPlus
                     string[] v = l.Split(new char[] { '=' }, 2); // Split the line at the first "equal" sign: key = value
                     if (v.Length < 2) continue;
 
-                    string key = v[0].Trim().ToLowerInvariant();
-                    string value = v[1].Trim().Trim('\"');
+                    string key = v[0].Trim().Trim('"').ToLowerInvariant();
+                    string value = v[1].Trim().Trim('"');
                     WriteValue(section, key, value);
                 }
             }
