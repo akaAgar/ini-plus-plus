@@ -68,7 +68,7 @@ namespace INIPlusPlus
             }
             set
             {
-                value = value?.ToLowerInvariant();
+                key = key?.ToLowerInvariant();
 
                 if (Values.ContainsKey(key))
                     Values[key] = value;
